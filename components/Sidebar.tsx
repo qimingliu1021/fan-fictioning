@@ -33,7 +33,7 @@ export default function Sidebar() {
 
                 {/* Action Button */}
                 <button
-                    className="mt-4 w-[90%] rounded-full bg-blue-500 py-4 text-xl font-bold text-white hover:bg-blue-600 transition-colors cursor-pointer"
+                    className="mt-4 w-[90%] rounded-full bg-gray-800 py-4 text-xl font-bold text-white hover:bg-gray-600 transition-colors cursor-pointer"
                     onClick={() => window.dispatchEvent(new CustomEvent('open-analyze-modal'))}
                 >
                     <span className="hidden xl:inline text-lg">Create</span>

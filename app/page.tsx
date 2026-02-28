@@ -45,16 +45,8 @@ export default function Home() {
   return (
     <div className="flex flex-col w-full h-full pb-20 sm:pb-0">
       {/* Header */}
-      <div className="sticky top-0 z-10 border-b border-zinc-200 dark:border-zinc-800 bg-white/80 dark:bg-black/80 backdrop-blur-md">
-        <div className="flex w-full">
-          <div className="flex flex-1 items-center justify-center h-14 hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-colors cursor-pointer relative">
-            <span className="font-bold text-black dark:text-white">For you</span>
-            <div className="absolute bottom-0 h-1 w-16 rounded-full bg-blue-500" />
-          </div>
-          <div className="flex flex-1 items-center justify-center h-14 hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-colors cursor-pointer text-zinc-500 dark:text-zinc-400">
-            <span className="font-medium">Following</span>
-          </div>
-        </div>
+      <div className="sticky top-0 z-10 border-b border-zinc-200 dark:border-zinc-800 bg-white/80 dark:bg-black/80 backdrop-blur-md px-4 h-14 flex items-center">
+        <h1 className="font-bold text-xl text-black dark:text-white">Home</h1>
       </div>
 
       {/* Feed Container */}

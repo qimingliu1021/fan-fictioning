@@ -36,21 +36,6 @@ export default function RootLayout({
           <main className="flex-1 flex justify-center border-l border-r border-zinc-200 dark:border-zinc-800 min-h-screen">
             {children}
           </main>
-
-          {/* Right Column (Trending/Search Placeholder) */}
-          <div className="hidden lg:block w-[350px] pl-8 py-4">
-            <div className="rounded-2xl border border-zinc-200 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 overflow-hidden">
-              <div className="p-4 border-b border-zinc-200 dark:border-zinc-800 font-bold text-xl">
-                Trending Fandoms
-              </div>
-              {['#Naruto', '#MyHeroAcademia', '#JujutsuKaisen', '#OnePiece', '#DemonSlayer'].map((tag) => (
-                <div key={tag} className="px-4 py-3 hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer transition-colors">
-                  <div className="font-bold">{tag}</div>
-                  <div className="text-sm text-zinc-500 dark:text-zinc-400">12.4K posts</div>
-                </div>
-              ))}
-            </div>
-          </div>
         </div>
         <AnalyzeModal />
       </body>
