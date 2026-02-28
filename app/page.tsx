@@ -1,4 +1,5 @@
 import { Heart, MessageCircle, Repeat2, Share } from "lucide-react";
+import Link from "next/link";
 
 export default function Home() {
   const MOCK_POSTS = [
@@ -40,65 +41,64 @@ export default function Home() {
       {/* Feed Container */}
       <div className="flex flex-col">
         {MOCK_POSTS.map((post) => (
-          <article
-            key={post.id}
-            className="flex gap-4 border-b border-zinc-200 px-4 py-3 hover:bg-zinc-400/50 transition-colors cursor-pointer"
-          >
-            {/* Avatar */}
-            <div className="h-10 w-10 shrink-0 rounded-full bg-blue-500/20" />
+          <Link href={`/post/${post.id}`} key={post.id} className="block border-b border-zinc-200 hover:bg-zinc-50 transition-colors">
+            <article className="flex gap-4 px-4 py-3 cursor-pointer">
+              {/* Avatar */}
+              <div className="h-10 w-10 shrink-0 rounded-full bg-blue-500/20" />
 
-            {/* Post Content */}
-            <div className="flex flex-col w-full">
-              <div className="flex items-center gap-1 text-sm">
-                <span className="font-bold text-black hover:underline">{post.author}</span>
-                <span className="text-zinc-500">{post.handle}</span>
-                <span className="text-zinc-500">·</span>
-                <span className="text-zinc-500 hover:underline">{post.time}</span>
-              </div>
-
-              <p className="mt-1 text-[15px] leading-tight text-black">
-                {post.content}
-              </p>
-
-              <div className="mt-1 text-sm text-blue-500">
-                {post.tags.join(" ")}
-              </div>
-
-              {/* Mock Image Box */}
-              {post.image && (
-                <div className="mt-3 aspect-video w-full rounded-2xl border border-zinc-200 bg-zinc-900 flex items-center justify-center relative overflow-hidden group">
-                  <p className="text-zinc-500 font-mono text-sm">[Generated Comic Output Placeholder]</p>
+              {/* Post Content */}
+              <div className="flex flex-col w-full">
+                <div className="flex items-center gap-1 text-sm">
+                  <span className="font-bold text-black hover:underline">{post.author}</span>
+                  <span className="text-zinc-500">{post.handle}</span>
+                  <span className="text-zinc-500">·</span>
+                  <span className="text-zinc-500 hover:underline">{post.time}</span>
                 </div>
-              )}
 
-              {/* Action Bar */}
-              <div className="mt-3 flex w-full justify-between text-zinc-500 max-w-md">
-                <button className="flex items-center gap-2 hover:text-blue-500 transition-colors group">
-                  <div className="rounded-full p-2 group-hover:bg-blue-500/10">
-                    <MessageCircle size={18} />
+                <p className="mt-1 text-[15px] leading-tight text-black">
+                  {post.content}
+                </p>
+
+                <div className="mt-1 text-sm text-blue-500">
+                  {post.tags.join(" ")}
+                </div>
+
+                {/* Mock Image Box */}
+                {post.image && (
+                  <div className="mt-3 aspect-video w-full rounded-2xl border border-zinc-200 bg-zinc-900 flex items-center justify-center relative overflow-hidden group">
+                    <p className="text-zinc-500 font-mono text-sm">[Generated Comic Output Placeholder]</p>
                   </div>
-                  <span className="text-xs">12</span>
-                </button>
-                <button className="flex items-center gap-2 hover:text-green-500 transition-colors group">
-                  <div className="rounded-full p-2 group-hover:bg-green-500/10">
-                    <Repeat2 size={18} />
-                  </div>
-                  <span className="text-xs">4</span>
-                </button>
-                <button className="flex items-center gap-2 hover:text-pink-500 transition-colors group">
-                  <div className="rounded-full p-2 group-hover:bg-pink-500/10">
-                    <Heart size={18} />
-                  </div>
-                  <span className="text-xs">148</span>
-                </button>
-                <button className="flex items-center gap-2 hover:text-blue-500 transition-colors group">
-                  <div className="rounded-full p-2 group-hover:bg-blue-500/10">
-                    <Share size={18} />
-                  </div>
-                </button>
+                )}
+
+                {/* Action Bar */}
+                <div className="mt-3 flex w-full justify-between text-zinc-500 max-w-md">
+                  <button className="flex items-center gap-2 hover:text-blue-500 transition-colors group">
+                    <div className="rounded-full p-2 group-hover:bg-blue-500/10">
+                      <MessageCircle size={18} />
+                    </div>
+                    <span className="text-xs">12</span>
+                  </button>
+                  <button className="flex items-center gap-2 hover:text-green-500 transition-colors group">
+                    <div className="rounded-full p-2 group-hover:bg-green-500/10">
+                      <Repeat2 size={18} />
+                    </div>
+                    <span className="text-xs">4</span>
+                  </button>
+                  <button className="flex items-center gap-2 hover:text-pink-500 transition-colors group">
+                    <div className="rounded-full p-2 group-hover:bg-pink-500/10">
+                      <Heart size={18} />
+                    </div>
+                    <span className="text-xs">148</span>
+                  </button>
+                  <button className="flex items-center gap-2 hover:text-blue-500 transition-colors group">
+                    <div className="rounded-full p-2 group-hover:bg-blue-500/10">
+                      <Share size={18} />
+                    </div>
+                  </button>
+                </div>
               </div>
-            </div>
-          </article>
+            </article>
+          </Link>
         ))}
         {/* End of feed message */}
         <div className="py-8 text-center text-zinc-600 border-b border-zinc-200">
