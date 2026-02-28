@@ -16,7 +16,7 @@ export async function POST(
         }
 
         const body = await request.json();
-        const { text, parentId, username } = body;
+        const { text, parentId, username, imageBase64 } = body;
 
         if (!text || typeof text !== "string" || text.trim() === "") {
             return NextResponse.json(
@@ -38,12 +38,14 @@ export async function POST(
             comicUid,
             username: user.username,
             text: text.trim(),
-            parentId: parentId || undefined
+            parentId: parentId || undefined,
+            imageBase64: imageBase64 || undefined
         });
 
         return NextResponse.json({
             uid: newComment.uid,
             text: newComment.text,
+            imageBase64: newComment.image_base64,
             likes: newComment.likes,
             createdAt: newComment.created_at,
             user: {

@@ -35,6 +35,7 @@ export async function GET(
             commentMap.set(c.uid, {
                 uid: c.uid,
                 text: c.text,
+                imageBase64: c.image_base64,
                 likes: c.likes,
                 createdAt: c.created_at,
                 user: {
