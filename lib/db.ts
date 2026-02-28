@@ -63,6 +63,25 @@ function getDb(): Database.Database {
       CREATE INDEX IF NOT EXISTS idx_comics_uid ON comics(uid)
     `);
 
+        db.exec(`
+      CREATE TABLE IF NOT EXISTS comments (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        uid TEXT NOT NULL UNIQUE,
+        comic_uid TEXT NOT NULL,
+        username TEXT NOT NULL,
+        parent_id TEXT,
+        text TEXT NOT NULL,
+        likes INTEGER NOT NULL DEFAULT 0,
+        created_at TEXT NOT NULL DEFAULT (datetime('now')),
+        FOREIGN KEY (comic_uid) REFERENCES comics(uid),
+        FOREIGN KEY (username) REFERENCES users(username)
+      )
+    `);
+
+        db.exec(`
+      CREATE INDEX IF NOT EXISTS idx_comments_comic_uid ON comments(comic_uid)
+    `);
+
         // Seed mock users if none exist
         const userCount = db.prepare("SELECT COUNT(*) as count FROM users").get() as { count: number };
         if (userCount.count === 0) {
@@ -167,6 +186,16 @@ export function getComic(id: number): Comic | undefined {
     return db.prepare("SELECT * FROM comics WHERE id = ?").get(id) as Comic | undefined;
 }
 
+export function getComicByUid(uid: string): ComicWithUser | undefined {
+    const db = getDb();
+    return db.prepare(`
+        SELECT c.*, u.display_name, u.avatar_url
+        FROM comics c
+        JOIN users u ON c.username = u.username
+        WHERE c.uid = ?
+    `).get(uid) as ComicWithUser | undefined;
+}
+
 export function getLatestComics(limit: number = 20, beforeUid?: string): ComicWithUser[] {
     const db = getDb();
 
@@ -243,4 +272,63 @@ export function saveCharacters(
 
     insertMany(characters);
     return getCharactersByYoutubeUrl(youtubeUrl);
+}
+
+// --- Comments ---
+
+export interface Comment {
+    id: number;
+    uid: string;
+    comic_uid: string;
+    username: string;
+    parent_id: string | null;
+    text: string;
+    likes: number;
+    created_at: string;
+}
+
+export interface CommentWithUser extends Comment {
+    display_name: string;
+    avatar_url: string | null;
+}
+
+export function getCommentsByComicUid(comicUid: string): CommentWithUser[] {
+    const db = getDb();
+    return db.prepare(`
+        SELECT c.*, u.display_name, u.avatar_url
+        FROM comments c
+        JOIN users u ON c.username = u.username
+        WHERE c.comic_uid = ?
+        ORDER BY c.created_at ASC
+    `).all(comicUid) as CommentWithUser[];
+}
+
+export function addComment(data: {
+    comicUid: string;
+    username: string;
+    text: string;
+    parentId?: string;
+}): CommentWithUser {
+    const db = getDb();
+    const uid = generateUid();
+
+    const stmt = db.prepare(`
+        INSERT INTO comments (uid, comic_uid, username, parent_id, text)
+        VALUES (?, ?, ?, ?, ?)
+    `);
+
+    stmt.run(
+        uid,
+        data.comicUid,
+        data.username,
+        data.parentId || null,
+        data.text
+    );
+
+    return db.prepare(`
+        SELECT c.*, u.display_name, u.avatar_url
+        FROM comments c
+        JOIN users u ON c.username = u.username
+        WHERE c.uid = ?
+    `).get(uid) as CommentWithUser;
 }

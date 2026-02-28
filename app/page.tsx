@@ -1,27 +1,46 @@
+"use client";
+
 import { Heart, MessageCircle, Repeat2, Share } from "lucide-react";
 import Link from "next/link";
+import { useEffect, useState } from "react";
+
+// Helper to format date relative to now
+function formatTimeAgo(dateString: string) {
+  const date = new Date(dateString);
+  const now = new Date();
+  const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+
+  if (diffInSeconds < 60) return "just now";
+  const diffInMinutes = Math.floor(diffInSeconds / 60);
+  if (diffInMinutes < 60) return `${diffInMinutes}m`;
+  const diffInHours = Math.floor(diffInMinutes / 60);
+  if (diffInHours < 24) return `${diffInHours}h`;
+  const diffInDays = Math.floor(diffInHours / 24);
+  return `${diffInDays}d`;
+}
 
 export default function Home() {
-  const MOCK_POSTS = [
-    {
-      id: 1,
-      author: "FanFic Creator",
-      handle: "@creator_ff",
-      time: "2h",
-      content: "Just generated this alternate ending for Naruto and Sasuke! What if they never fought at the Valley of the End? 🍥⚡️",
-      tags: ["#Naruto", "#FanFiction", "#WhatIf"],
-      image: true
-    },
-    {
-      id: 2,
-      author: "Anime Enjoyer",
-      handle: "@weeb_life",
-      time: "5h",
-      content: "The comic generator is literally insane. I put in a One Piece clip and the generated art for Zoro looks officially drawn. 🗡️",
-      tags: ["#OnePiece", "#Zoro"],
-      image: false
-    },
-  ];
+  const [comics, setComics] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchFeed() {
+      try {
+        const res = await fetch("/api/feed");
+        if (!res.ok) throw new Error("Failed to fetch feed");
+        const data = await res.json();
+        setComics(data.comics || []);
+      } catch (err: any) {
+        console.error(err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchFeed();
+  }, []);
 
   return (
     <div className="flex flex-col w-full h-full pb-20 sm:pb-0">
@@ -40,33 +59,45 @@ export default function Home() {
 
       {/* Feed Container */}
       <div className="flex flex-col">
-        {MOCK_POSTS.map((post) => (
-          <Link href={`/post/${post.id}`} key={post.id} className="block border-b border-zinc-200 hover:bg-zinc-50 transition-colors">
+        {loading && (
+          <div className="py-8 text-center text-zinc-500 font-medium">Loading feed...</div>
+        )}
+        {error && (
+          <div className="py-8 text-center text-red-500 font-medium">{error}</div>
+        )}
+        {!loading && !error && comics.map((comic) => (
+          <Link href={`/post/${comic.uid}`} key={comic.uid} className="block border-b border-zinc-200 hover:bg-zinc-50 transition-colors">
             <article className="flex gap-4 px-4 py-3 cursor-pointer">
               {/* Avatar */}
-              <div className="h-10 w-10 shrink-0 rounded-full bg-blue-500/20" />
+              <div className="h-10 w-10 shrink-0 rounded-full bg-blue-500/20 overflow-hidden flex items-center justify-center">
+                {comic.user?.avatarUrl ? (
+                  <img src={comic.user.avatarUrl} alt="avatar" className="w-full h-full object-cover" />
+                ) : (
+                  <span className="font-bold text-blue-700 uppercase">{comic.user?.displayName?.charAt(0) || '?'}</span>
+                )}
+              </div>
 
               {/* Post Content */}
               <div className="flex flex-col w-full">
                 <div className="flex items-center gap-1 text-sm">
-                  <span className="font-bold text-black hover:underline">{post.author}</span>
-                  <span className="text-zinc-500">{post.handle}</span>
+                  <span className="font-bold text-black hover:underline">{comic.user?.displayName || "Unknown"}</span>
+                  <span className="text-zinc-500">@{comic.user?.username || "unknown"}</span>
                   <span className="text-zinc-500">·</span>
-                  <span className="text-zinc-500 hover:underline">{post.time}</span>
+                  <span className="text-zinc-500 hover:underline">{formatTimeAgo(comic.createdAt)}</span>
                 </div>
 
                 <p className="mt-1 text-[15px] leading-tight text-black">
-                  {post.content}
+                  {comic.userPrompt}
                 </p>
 
                 <div className="mt-1 text-sm text-blue-500">
-                  {post.tags.join(" ")}
+                  #{comic.character.replace(/\s+/g, '')} #{comic.movie.replace(/\s+/g, '')}
                 </div>
 
-                {/* Mock Image Box */}
-                {post.image && (
-                  <div className="mt-3 aspect-video w-full rounded-2xl border border-zinc-200 bg-zinc-900 flex items-center justify-center relative overflow-hidden group">
-                    <p className="text-zinc-500 font-mono text-sm">[Generated Comic Output Placeholder]</p>
+                {/* Comic Image Box */}
+                {comic.imageBase64 && (
+                  <div className="mt-3 w-full rounded-2xl border border-zinc-200 bg-zinc-900 flex items-center justify-center relative overflow-hidden group">
+                    <img src={`data:image/jpeg;base64,${comic.imageBase64}`} alt="Comic" className="w-full h-auto object-contain" />
                   </div>
                 )}
 
@@ -76,19 +107,19 @@ export default function Home() {
                     <div className="rounded-full p-2 group-hover:bg-blue-500/10">
                       <MessageCircle size={18} />
                     </div>
-                    <span className="text-xs">12</span>
+                    <span className="text-xs">0</span>
                   </button>
                   <button className="flex items-center gap-2 hover:text-green-500 transition-colors group">
                     <div className="rounded-full p-2 group-hover:bg-green-500/10">
                       <Repeat2 size={18} />
                     </div>
-                    <span className="text-xs">4</span>
+                    <span className="text-xs">0</span>
                   </button>
                   <button className="flex items-center gap-2 hover:text-pink-500 transition-colors group">
                     <div className="rounded-full p-2 group-hover:bg-pink-500/10">
                       <Heart size={18} />
                     </div>
-                    <span className="text-xs">148</span>
+                    <span className="text-xs">0</span>
                   </button>
                   <button className="flex items-center gap-2 hover:text-blue-500 transition-colors group">
                     <div className="rounded-full p-2 group-hover:bg-blue-500/10">
@@ -101,9 +132,16 @@ export default function Home() {
           </Link>
         ))}
         {/* End of feed message */}
-        <div className="py-8 text-center text-zinc-600 border-b border-zinc-200">
-          No more posts to show.
-        </div>
+        {!loading && !error && comics.length > 0 && (
+          <div className="py-8 text-center text-zinc-600 border-b border-zinc-200">
+            No more posts to show.
+          </div>
+        )}
+        {!loading && !error && comics.length === 0 && (
+          <div className="py-8 text-center text-zinc-600 border-b border-zinc-200">
+            Your feed is empty. Start generating some comics!
+          </div>
+        )}
       </div>
     </div>
   );

@@ -11,6 +11,8 @@ export default function AnalyzeModal() {
     const [characters, setCharacters] = useState<string[]>([]);
     const [selectedCharacter, setSelectedCharacter] = useState<string | null>(null);
     const [storyInput, setStoryInput] = useState("");
+    const [generatedComic, setGeneratedComic] = useState<any>(null);
+    const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
     // Listen for the custom event from the Sidebar to open the modal
     useEffect(() => {
@@ -27,24 +29,58 @@ export default function AnalyzeModal() {
             setCharacters([]);
             setSelectedCharacter(null);
             setStoryInput("");
+            setGeneratedComic(null);
+            setErrorMsg(null);
         }, 300);
     };
 
     const handleAnalyze = async () => {
         if (!url) return;
         setModalState("loading-analysis");
-        // Simulate API Call
-        await new Promise((resolve) => setTimeout(resolve, 1500));
-        setCharacters(["Naruto Uzumaki", "Sasuke Uchiha", "Sakura Haruno"]);
-        setModalState("story");
+        setErrorMsg(null);
+        try {
+            const res = await fetch("/api/characters", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ youtubeUrl: url })
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || "Failed to analyze characters");
+
+            setCharacters(data.characters.map((c: any) => c.name));
+            setModalState("story");
+        } catch (err: any) {
+            console.error(err);
+            setErrorMsg(err.message);
+            setModalState("input"); // go back to input on error
+        }
     };
 
     const handleGenerate = async () => {
         if (!storyInput || !selectedCharacter) return;
         setModalState("loading-comic");
-        // Simulate API Call
-        await new Promise((resolve) => setTimeout(resolve, 2000));
-        setModalState("result");
+        setErrorMsg(null);
+        try {
+            const res = await fetch("/api/comic", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    character: selectedCharacter,
+                    userPrompt: storyInput,
+                    youtubeUrl: url,
+                    username: "moviebuff42" // mock logged-in user
+                })
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || "Failed to generate comic");
+
+            setGeneratedComic(data);
+            setModalState("result");
+        } catch (err: any) {
+            console.error(err);
+            setErrorMsg(err.message);
+            setModalState("story"); // go back to story input on error
+        }
     };
 
     if (modalState === "closed") return null;
@@ -83,6 +119,7 @@ export default function AnalyzeModal() {
                                     className="w-full rounded-xl border border-zinc-200 bg-zinc-50 p-4 text-black focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                                     autoFocus
                                 />
+                                {errorMsg && <p className="text-red-500 text-sm font-medium">{errorMsg}</p>}
                             </div>
                             <button
                                 className={`self-end rounded-full px-6 py-2 transition-colors cursor-pointer disabled:cursor-not-allowed ${!url
@@ -134,6 +171,7 @@ export default function AnalyzeModal() {
                                     onChange={(e) => setStoryInput(e.target.value)}
                                     className="w-full min-h-[120px] rounded-xl border border-zinc-200 bg-zinc-50 p-4 text-black resize-none focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                                 />
+                                {errorMsg && <p className="text-red-500 text-sm font-medium">{errorMsg}</p>}
                             </div>
 
                             <button
@@ -162,7 +200,15 @@ export default function AnalyzeModal() {
                     {modalState === "result" && (
                         <div className="flex flex-col gap-6 animate-in fade-in duration-300">
                             <div className="flex items-center justify-center bg-zinc-50 rounded-xl aspect-video border border-zinc-200 relative overflow-hidden group">
-                                <p className="text-zinc-600 font-mono text-sm">[Comic Image Generated for: {selectedCharacter}]</p>
+                                {generatedComic?.imageBase64 ? (
+                                    <img
+                                        src={`data:image/jpeg;base64,${generatedComic.imageBase64}`}
+                                        alt="Generated Comic"
+                                        className="w-full h-full object-cover"
+                                    />
+                                ) : (
+                                    <p className="text-zinc-600 font-mono text-sm">[Comic Image Generated for: {selectedCharacter}]</p>
+                                )}
                                 <div className="absolute top-2 right-2 flex bg-black/60 backdrop-blur-md rounded-full px-3 py-1 items-center gap-1 text-xs text-green-400 font-medium">
                                     <CheckCircle2 size={14} /> Success
                                 </div>
@@ -172,8 +218,9 @@ export default function AnalyzeModal() {
                                 <button
                                     className="w-full rounded-full bg-black py-3 font-bold text-white hover:bg-zinc-800 transition-colors cursor-pointer"
                                     onClick={() => {
-                                        console.log("Mock: Posted to feed");
-                                        closeModal();
+                                        // Instead of mock log, ideally navigate to post or refresh feed
+                                        // For now, reload window to show it in feed
+                                        window.location.reload();
                                     }}
                                 >
                                     Post to Feed

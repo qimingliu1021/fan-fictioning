@@ -1,58 +1,88 @@
+"use client";
+
 import { Heart, MessageCircle, Repeat2, Share, ArrowLeft, ArrowUp, ArrowDown } from "lucide-react";
 import Link from "next/link";
+import { useEffect, useState } from "react";
+
+// Helper to format date relative to now
+function formatTimeAgo(dateString: string) {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+
+    if (diffInSeconds < 60) return "just now";
+    const diffInMinutes = Math.floor(diffInSeconds / 60);
+    if (diffInMinutes < 60) return `${diffInMinutes}m`;
+    const diffInHours = Math.floor(diffInMinutes / 60);
+    if (diffInHours < 24) return `${diffInHours}h`;
+    const diffInDays = Math.floor(diffInHours / 24);
+    return `${diffInDays}d`;
+}
 
 export default function PostPage({ params }: { params: { id: string } }) {
-    // Mock finding a post
-    const post = {
-        id: params.id,
-        author: "FanFic Creator",
-        handle: "@creator_ff",
-        time: "2h",
-        content: "Just generated this alternate ending for Naruto and Sasuke! What if they never fought at the Valley of the End? 🍥⚡️",
-        tags: ["#Naruto", "#FanFiction", "#WhatIf"],
-        image: true
+    const comicUid = params.id;
+    const [comic, setComic] = useState<any>(null);
+    const [comments, setComments] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
+    const [replyText, setReplyText] = useState("");
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    // Which comment ID we are replying to (null = top level reply to the post)
+    const [replyingToId, setReplyingToId] = useState<string | null>(null);
+
+    const fetchComic = async () => {
+        try {
+            const res = await fetch(`/api/comic/${comicUid}`);
+            if (!res.ok) throw new Error("Failed to fetch comic details");
+            const data = await res.json();
+            setComic(data.comic);
+            setComments(data.comments || []);
+        } catch (err: any) {
+            console.error(err);
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
     };
 
-    const MOCK_COMMENTS = [
-        {
-            id: 101,
-            author: "AnimeFan99",
-            handle: "@weeb_master",
-            time: "1h",
-            text: "This is so cool! I always wondered what would happen if they teamed up against Madara earlier.",
-            likes: 42,
-            replies: [
-                {
-                    id: 102,
-                    author: "NarutoLover",
-                    handle: "@naru_hina",
-                    time: "45m",
-                    text: "Right? The animation style here looks exactly like Shippuden!",
-                    likes: 12,
-                    replies: [
-                        {
-                            id: 104,
-                            author: "BorutoHater",
-                            handle: "@og_fan",
-                            time: "10m",
-                            text: "Much better than anything in the new series tbh.",
-                            likes: 8,
-                            replies: []
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            id: 103,
-            author: "SasukeStan",
-            handle: "@uchiha_avenger",
-            time: "30m",
-            text: "The details on Susanoo are incredible.",
-            likes: 8,
-            replies: []
+    useEffect(() => {
+        fetchComic();
+    }, [comicUid]);
+
+    const handlePostComment = async () => {
+        if (!replyText.trim() || isSubmitting) return;
+        setIsSubmitting(true);
+        try {
+            const res = await fetch(`/api/comic/${comicUid}/comments`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    text: replyText,
+                    parentId: replyingToId,
+                    username: "moviebuff42" // mock logged-in user
+                })
+            });
+            if (!res.ok) throw new Error("Failed to post comment");
+
+            // Reload to get updated nested tree
+            await fetchComic();
+            setReplyText("");
+            setReplyingToId(null);
+        } catch (err) {
+            console.error(err);
+            alert("Failed to post comment.");
+        } finally {
+            setIsSubmitting(false);
         }
-    ];
+    };
+
+    if (loading) return <div className="p-8 text-center text-zinc-500">Loading post...</div>;
+    if (error || !comic) return <div className="p-8 text-center text-red-500">{error || "Post not found."}</div>;
+
+    const dateStr = new Date(comic.createdAt).toLocaleDateString("en-US", {
+        month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "numeric"
+    });
 
     return (
         <div className="flex flex-col w-full min-h-screen pb-20 justify-start bg-white">
@@ -68,30 +98,36 @@ export default function PostPage({ params }: { params: { id: string } }) {
             <article className="flex flex-col gap-4 border-b border-zinc-200 px-4 py-4">
                 {/* Author Header */}
                 <div className="flex items-center gap-3">
-                    <div className="h-12 w-12 shrink-0 rounded-full bg-blue-500/20" />
+                    <div className="h-12 w-12 shrink-0 rounded-full bg-blue-500/20 overflow-hidden flex items-center justify-center">
+                        {comic.user?.avatarUrl ? (
+                            <img src={comic.user.avatarUrl} alt="avatar" className="w-full h-full object-cover" />
+                        ) : (
+                            <span className="font-bold text-xl text-blue-700 uppercase">{comic.user?.displayName?.charAt(0) || '?'}</span>
+                        )}
+                    </div>
                     <div className="flex flex-col">
-                        <span className="font-bold text-black hover:underline cursor-pointer">{post.author}</span>
-                        <span className="text-zinc-500 text-sm">{post.handle}</span>
+                        <span className="font-bold text-black hover:underline cursor-pointer">{comic.user?.displayName || "Unknown"}</span>
+                        <span className="text-zinc-500 text-sm">@{comic.user?.username || "unknown"}</span>
                     </div>
                 </div>
 
                 <p className="text-[17px] leading-relaxed text-black mt-2">
-                    {post.content}
+                    {comic.userPrompt}
                 </p>
 
                 <div className="text-sm text-blue-500">
-                    {post.tags.join(" ")}
+                    #{comic.character.replace(/\s+/g, '')} #{comic.movie.replace(/\s+/g, '')}
                 </div>
 
-                {post.image && (
-                    <div className="mt-2 aspect-video w-full rounded-2xl border border-zinc-200 bg-zinc-900 flex items-center justify-center relative overflow-hidden">
-                        <p className="text-zinc-500 font-mono text-sm">[Generated Comic Output Placeholder]</p>
+                {comic.imageBase64 && (
+                    <div className="mt-2 w-full rounded-2xl border border-zinc-200 bg-zinc-900 flex items-center justify-center relative overflow-hidden">
+                        <img src={`data:image/jpeg;base64,${comic.imageBase64}`} alt="Comic" className="w-full h-auto object-contain" />
                     </div>
                 )}
 
                 {/* Timestamp */}
                 <div className="text-sm text-zinc-500 py-3 border-b border-zinc-100">
-                    10:24 AM · Oct 21, 2026 · <span className="text-black font-semibold">124.5K</span> Views
+                    {dateStr} · <span className="text-black font-semibold">0</span> Views
                 </div>
 
                 {/* Action Bar */}
@@ -124,14 +160,28 @@ export default function PostPage({ params }: { params: { id: string } }) {
 
             {/* Composition Area */}
             <div className="flex gap-3 px-4 py-4 border-b border-zinc-200">
-                <div className="h-10 w-10 shrink-0 rounded-full bg-zinc-200" />
+                <div className="h-10 w-10 shrink-0 rounded-full bg-blue-500/20 overflow-hidden flex items-center justify-center">
+                    <span className="font-bold text-blue-700 uppercase">M</span>
+                </div>
                 <div className="flex flex-col w-full gap-2">
+                    {replyingToId && (
+                        <div className="flex items-center justify-between text-sm text-zinc-500 bg-zinc-50 p-2 rounded-md">
+                            <span>Replying to thread...</span>
+                            <button className="hover:text-black font-bold" onClick={() => setReplyingToId(null)}>Cancel</button>
+                        </div>
+                    )}
                     <textarea
-                        placeholder="Post your reply"
+                        value={replyText}
+                        onChange={(e) => setReplyText(e.target.value)}
+                        placeholder={replyingToId ? "Write a reply..." : "Post your reply"}
                         className="w-full bg-transparent border-none focus:outline-none resize-none min-h-[50px] text-lg text-black placeholder:text-zinc-500"
                     />
                     <div className="flex justify-end">
-                        <button className="bg-black text-white font-bold rounded-full px-5 py-2 hover:bg-zinc-800 transition-colors cursor-pointer">
+                        <button
+                            disabled={!replyText.trim() || isSubmitting}
+                            onClick={handlePostComment}
+                            className="bg-black text-white font-bold rounded-full px-5 py-2 hover:bg-zinc-800 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
                             Reply
                         </button>
                     </div>
@@ -140,15 +190,27 @@ export default function PostPage({ params }: { params: { id: string } }) {
 
             {/* Comment Thread (Reddit Style) */}
             <div className="flex flex-col">
-                {MOCK_COMMENTS.map(comment => (
-                    <CommentThread key={comment.id} comment={comment} isTopLevel={true} />
-                ))}
+                {comments.length === 0 ? (
+                    <div className="py-8 text-center text-zinc-500 bg-white">No comments yet. Be the first to reply!</div>
+                ) : (
+                    comments.map(comment => (
+                        <CommentThread
+                            key={comment.uid}
+                            comment={comment}
+                            isTopLevel={true}
+                            onReply={(id) => {
+                                setReplyingToId(id);
+                                window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+                            }}
+                        />
+                    ))
+                )}
             </div>
         </div>
     );
 }
 
-function CommentThread({ comment, isTopLevel }: { comment: any, isTopLevel: boolean }) {
+function CommentThread({ comment, isTopLevel, onReply }: { comment: any, isTopLevel: boolean, onReply: (id: string) => void }) {
     return (
         <div className={`flex gap-3 px-4 py-3 ${isTopLevel ? 'border-b border-zinc-100' : 'pt-3'}`}>
             {/* Avatar & Thread Line Col */}
@@ -162,10 +224,10 @@ function CommentThread({ comment, isTopLevel }: { comment: any, isTopLevel: bool
             {/* Comment Body */}
             <div className="flex flex-col w-full pb-2">
                 <div className="flex items-center gap-2 text-sm">
-                    <span className="font-bold text-black hover:underline cursor-pointer">{comment.author}</span>
-                    <span className="text-zinc-500 cursor-pointer">{comment.handle}</span>
+                    <span className="font-bold text-black hover:underline cursor-pointer">{comment.user?.displayName || "Unknown"}</span>
+                    <span className="text-zinc-500 cursor-pointer">@{comment.user?.username || "unknown"}</span>
                     <span className="text-zinc-500">·</span>
-                    <span className="text-zinc-500 hover:underline cursor-pointer">{comment.time}</span>
+                    <span className="text-zinc-500 hover:underline cursor-pointer">{formatTimeAgo(comment.createdAt)}</span>
                 </div>
                 <p className="mt-1 text-[15px] text-black">
                     {comment.text}
@@ -178,7 +240,10 @@ function CommentThread({ comment, isTopLevel }: { comment: any, isTopLevel: bool
                         <span className="text-xs font-bold text-black">{comment.likes}</span>
                         <ArrowDown size={16} className="hover:text-indigo-500" />
                     </div>
-                    <button className="flex items-center gap-1 text-xs font-bold hover:bg-zinc-100 px-3 py-1.5 rounded-full transition-colors cursor-pointer">
+                    <button
+                        onClick={() => onReply(comment.uid)}
+                        className="flex items-center gap-1 text-xs font-bold hover:bg-zinc-100 px-3 py-1.5 rounded-full transition-colors cursor-pointer"
+                    >
                         <MessageCircle size={16} />
                         Reply
                     </button>
@@ -192,7 +257,7 @@ function CommentThread({ comment, isTopLevel }: { comment: any, isTopLevel: bool
                 {comment.replies && comment.replies.length > 0 && (
                     <div className="mt-1">
                         {comment.replies.map((reply: any) => (
-                            <CommentThread key={reply.id} comment={reply} isTopLevel={false} />
+                            <CommentThread key={reply.uid} comment={reply} isTopLevel={false} onReply={onReply} />
                         ))}
                     </div>
                 )}

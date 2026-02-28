@@ -1,10 +1,10 @@
 import { GoogleGenAI } from "@google/genai";
 
 if (!process.env.GEMINI_API_KEY) {
-    throw new Error("GEMINI_API_KEY environment variable is not set");
+    console.warn("⚠️ GEMINI_API_KEY environment variable is not set. Comic generation will fail, but the app won't crash.");
 }
 
-export const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+export const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "dummy_key_for_ui_testing" });
 
 // Model for video understanding and text generation (script writing)
 export const TEXT_MODEL = "gemini-3-flash-preview";
