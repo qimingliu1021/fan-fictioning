@@ -3,6 +3,7 @@
 import { Heart, MessageCircle, Repeat2, Share, ArrowLeft, ArrowUp, ArrowDown } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
 
 // Helper to format date relative to now
 function formatTimeAgo(dateString: string) {
@@ -19,7 +20,8 @@ function formatTimeAgo(dateString: string) {
     return `${diffInDays}d`;
 }
 
-export default function PostPage({ params }: { params: { id: string } }) {
+export default function PostPage() {
+    const params = useParams<{ id: string }>();
     const comicUid = params.id;
     const [comic, setComic] = useState<any>(null);
     const [comments, setComments] = useState<any[]>([]);
@@ -32,6 +34,7 @@ export default function PostPage({ params }: { params: { id: string } }) {
     const [replyingToId, setReplyingToId] = useState<string | null>(null);
 
     const fetchComic = async () => {
+        if (!comicUid) return; // Wait until ID is available
         try {
             const res = await fetch(`/api/comic/${comicUid}`);
             if (!res.ok) throw new Error("Failed to fetch comic details");
