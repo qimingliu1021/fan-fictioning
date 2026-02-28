@@ -87,17 +87,17 @@ export default function AnalyzeModal() {
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-            <div className="relative w-full max-w-[500px] rounded-2xl bg-white border border-zinc-200 shadow-2xl overflow-hidden min-h-[300px]">
+            <div className="relative w-full max-w-[500px] rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-2xl overflow-hidden min-h-[300px]">
 
                 {/* Header */}
-                <div className="flex items-center justify-between border-b border-zinc-200 px-4 py-3">
+                <div className="flex items-center justify-between border-b border-zinc-200 dark:border-zinc-800 px-4 py-3">
                     <button
                         onClick={closeModal}
-                        className="rounded-full p-2 hover:bg-zinc-100 transition-colors"
+                        className="rounded-full p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
                     >
-                        <X size={20} className="text-black" />
+                        <X size={20} className="text-black dark:text-white" />
                     </button>
-                    <span className="font-bold text-black">
+                    <span className="font-bold text-black dark:text-white">
                         {modalState === "input" || modalState === "loading-analysis" ? "Analyze YouTube Video" : "Generate Comic"}
                     </span>
                     <div className="w-10" />
@@ -110,13 +110,13 @@ export default function AnalyzeModal() {
                     {modalState === "input" && (
                         <div className="flex flex-col gap-4">
                             <div className="flex flex-col gap-4">
-                                <p className="text-zinc-600 text-sm">Paste a YouTube link to extract characters and settings for your fan fiction.</p>
+                                <p className="text-zinc-600 dark:text-zinc-400 text-sm">Paste a YouTube link to extract characters and settings for your fan fiction.</p>
                                 <input
                                     type="text"
                                     placeholder="https://youtube.com/watch?v=..."
                                     value={url}
                                     onChange={(e) => setUrl(e.target.value)}
-                                    className="w-full rounded-xl border border-zinc-200 bg-zinc-50 p-4 text-black focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                    className="w-full rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800/50 p-4 text-black dark:text-white focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 placeholder:text-zinc-400 dark:placeholder:text-zinc-500"
                                     autoFocus
                                 />
                                 {errorMsg && <p className="text-red-500 text-sm font-medium">{errorMsg}</p>}
@@ -138,7 +138,7 @@ export default function AnalyzeModal() {
                     {modalState === "loading-analysis" && (
                         <div className="flex flex-col items-center justify-center py-12 gap-4">
                             <Sparkles className="animate-pulse text-blue-500" size={48} />
-                            <p className="text-zinc-600 font-medium">Extracting characters from video...</p>
+                            <p className="text-zinc-600 dark:text-zinc-400 font-medium">Extracting characters from video...</p>
                         </div>
                     )}
 
@@ -146,15 +146,15 @@ export default function AnalyzeModal() {
                     {modalState === "story" && (
                         <div className="flex flex-col gap-6 animate-in fade-in duration-300">
                             <div>
-                                <h3 className="text-lg font-bold mb-3">1. Select Character</h3>
+                                <h3 className="text-lg font-bold mb-3 text-black dark:text-white">1. Select Character</h3>
                                 <div className="flex flex-wrap gap-2">
                                     {characters.map(char => (
                                         <button
                                             key={char}
                                             onClick={() => setSelectedCharacter(char)}
                                             className={`rounded-full px-4 py-2 text-sm font-semibold transition-all border ${selectedCharacter === char
-                                                ? "bg-black border-black text-white"
-                                                : "border-zinc-200 bg-white hover:bg-zinc-100 text-black"
+                                                ? "bg-black border-black text-white dark:bg-white dark:border-white dark:text-black"
+                                                : "border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-black dark:text-white"
                                                 }`}
                                         >
                                             {char}
@@ -164,12 +164,12 @@ export default function AnalyzeModal() {
                             </div>
 
                             <div>
-                                <h3 className="text-lg font-bold mb-3 text-black">2. Write your Fan Fiction</h3>
+                                <h3 className="text-lg font-bold mb-3 text-black dark:text-white">2. Write your Fan Fiction</h3>
                                 <textarea
                                     placeholder="What happens to them?"
                                     value={storyInput}
                                     onChange={(e) => setStoryInput(e.target.value)}
-                                    className="w-full min-h-[120px] rounded-xl border border-zinc-200 bg-zinc-50 p-4 text-black resize-none focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                    className="w-full min-h-[120px] rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800/50 p-4 text-black dark:text-white resize-none focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 placeholder:text-zinc-400 dark:placeholder:text-zinc-500"
                                 />
                                 {errorMsg && <p className="text-red-500 text-sm font-medium">{errorMsg}</p>}
                             </div>
@@ -191,15 +191,15 @@ export default function AnalyzeModal() {
                     {/* LOADING COMIC */}
                     {modalState === "loading-comic" && (
                         <div className="flex flex-col items-center justify-center py-12 gap-4">
-                            <div className="h-12 w-12 animate-spin rounded-full border-4 border-zinc-200 border-t-blue-500" />
-                            <p className="text-zinc-600 font-medium tracking-wide">Drawing your comic...</p>
+                            <div className="h-12 w-12 animate-spin rounded-full border-4 border-zinc-200 dark:border-zinc-800 border-t-blue-500" />
+                            <p className="text-zinc-600 dark:text-zinc-400 font-medium tracking-wide">Drawing your comic...</p>
                         </div>
                     )}
 
                     {/* STEP 3: RESULT */}
                     {modalState === "result" && (
                         <div className="flex flex-col gap-6 animate-in fade-in duration-300">
-                            <div className="flex items-center justify-center bg-zinc-50 rounded-xl aspect-video border border-zinc-200 relative overflow-hidden group">
+                            <div className="flex items-center justify-center bg-zinc-50 dark:bg-zinc-800 rounded-xl aspect-video border border-zinc-200 dark:border-zinc-700 relative overflow-hidden group">
                                 {generatedComic?.imageBase64 ? (
                                     <img
                                         src={`data:image/jpeg;base64,${generatedComic.imageBase64}`}
@@ -207,7 +207,7 @@ export default function AnalyzeModal() {
                                         className="w-full h-full object-cover"
                                     />
                                 ) : (
-                                    <p className="text-zinc-600 font-mono text-sm">[Comic Image Generated for: {selectedCharacter}]</p>
+                                    <p className="text-zinc-600 dark:text-zinc-400 font-mono text-sm">[Comic Image Generated for: {selectedCharacter}]</p>
                                 )}
                                 <div className="absolute top-2 right-2 flex bg-black/60 backdrop-blur-md rounded-full px-3 py-1 items-center gap-1 text-xs text-green-400 font-medium">
                                     <CheckCircle2 size={14} /> Success
@@ -216,10 +216,8 @@ export default function AnalyzeModal() {
 
                             <div className="flex flex-col gap-3">
                                 <button
-                                    className="w-full rounded-full bg-black py-3 font-bold text-white hover:bg-zinc-800 transition-colors cursor-pointer"
+                                    className="w-full rounded-full bg-black dark:bg-white py-3 font-bold text-white dark:text-black hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-colors cursor-pointer"
                                     onClick={() => {
-                                        // Instead of mock log, ideally navigate to post or refresh feed
-                                        // For now, reload window to show it in feed
                                         window.location.reload();
                                     }}
                                 >
@@ -227,7 +225,7 @@ export default function AnalyzeModal() {
                                 </button>
                                 <div className="flex gap-3">
                                     <button
-                                        className="flex-1 rounded-full border border-zinc-200 bg-white py-3 font-bold text-black hover:bg-zinc-200 transition-colors cursor-pointer"
+                                        className="flex-1 rounded-full border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 py-3 font-bold text-black dark:text-white hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
                                         onClick={() => {
                                             console.log("Mock: Saved comic");
                                             closeModal();
@@ -236,7 +234,7 @@ export default function AnalyzeModal() {
                                         Save Comic
                                     </button>
                                     <button
-                                        className="flex-1 rounded-full border border-transparent py-3 font-bold text-red-500 transition-colors hover:bg-red-50 cursor-pointer"
+                                        className="flex-1 rounded-full border border-transparent py-3 font-bold text-red-500 transition-colors hover:bg-red-50 dark:hover:bg-red-950/30 cursor-pointer"
                                         onClick={closeModal}
                                     >
                                         Discard

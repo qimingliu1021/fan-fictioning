@@ -85,17 +85,17 @@ export default function PostPage({ params }: { params: { id: string } }) {
     });
 
     return (
-        <div className="flex flex-col w-full min-h-screen pb-20 justify-start bg-white">
+        <div className="flex flex-col w-full min-h-screen pb-20 justify-start bg-white dark:bg-black">
             {/* Header */}
-            <div className="sticky top-0 z-10 border-b border-zinc-200 bg-white/80 backdrop-blur-md px-4 py-3 flex items-center gap-6">
-                <Link href="/" className="p-2 rounded-full hover:bg-zinc-100 transition-colors">
-                    <ArrowLeft size={20} className="text-black" />
+            <div className="sticky top-0 z-10 border-b border-zinc-200 dark:border-zinc-800 bg-white/80 dark:bg-black/80 backdrop-blur-md px-4 py-3 flex items-center gap-6">
+                <Link href="/" className="p-2 rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-colors">
+                    <ArrowLeft size={20} className="text-black dark:text-white" />
                 </Link>
-                <h1 className="font-bold text-xl text-black">Post</h1>
+                <h1 className="font-bold text-xl text-black dark:text-white">Post</h1>
             </div>
 
             {/* Main Post */}
-            <article className="flex flex-col gap-4 border-b border-zinc-200 px-4 py-4">
+            <article className="flex flex-col gap-4 border-b border-zinc-200 dark:border-zinc-800 px-4 py-4">
                 {/* Author Header */}
                 <div className="flex items-center gap-3">
                     <div className="h-12 w-12 shrink-0 rounded-full bg-blue-500/20 overflow-hidden flex items-center justify-center">
@@ -106,12 +106,12 @@ export default function PostPage({ params }: { params: { id: string } }) {
                         )}
                     </div>
                     <div className="flex flex-col">
-                        <span className="font-bold text-black hover:underline cursor-pointer">{comic.user?.displayName || "Unknown"}</span>
-                        <span className="text-zinc-500 text-sm">@{comic.user?.username || "unknown"}</span>
+                        <span className="font-bold text-black dark:text-white hover:underline cursor-pointer">{comic.user?.displayName || "Unknown"}</span>
+                        <span className="text-zinc-500 dark:text-zinc-400 text-sm">@{comic.user?.username || "unknown"}</span>
                     </div>
                 </div>
 
-                <p className="text-[17px] leading-relaxed text-black mt-2">
+                <p className="text-[17px] leading-relaxed text-black dark:text-zinc-100 mt-2">
                     {comic.userPrompt}
                 </p>
 
@@ -126,12 +126,12 @@ export default function PostPage({ params }: { params: { id: string } }) {
                 )}
 
                 {/* Timestamp */}
-                <div className="text-sm text-zinc-500 py-3 border-b border-zinc-100">
-                    {dateStr} · <span className="text-black font-semibold">0</span> Views
+                <div className="text-sm text-zinc-500 dark:text-zinc-400 py-3 border-b border-zinc-100 dark:border-zinc-800">
+                    {dateStr} · <span className="text-black dark:text-white font-semibold">0</span> Views
                 </div>
 
                 {/* Action Bar */}
-                <div className="flex w-full justify-between text-zinc-500 py-3 border-b border-zinc-100 px-2 lg:px-8">
+                <div className="flex w-full justify-between text-zinc-500 dark:text-zinc-400 py-3 border-b border-zinc-100 dark:border-zinc-800 px-2 lg:px-8">
                     <button className="flex items-center gap-2 hover:text-blue-500 transition-colors group cursor-pointer">
                         <div className="rounded-full p-2 group-hover:bg-blue-500/10">
                             <MessageCircle size={20} />
@@ -159,22 +159,22 @@ export default function PostPage({ params }: { params: { id: string } }) {
             </article>
 
             {/* Composition Area */}
-            <div className="flex gap-3 px-4 py-4 border-b border-zinc-200">
+            <div className="flex gap-3 px-4 py-4 border-b border-zinc-200 dark:border-zinc-800">
                 <div className="h-10 w-10 shrink-0 rounded-full bg-blue-500/20 overflow-hidden flex items-center justify-center">
                     <span className="font-bold text-blue-700 uppercase">M</span>
                 </div>
                 <div className="flex flex-col w-full gap-2">
                     {replyingToId && (
-                        <div className="flex items-center justify-between text-sm text-zinc-500 bg-zinc-50 p-2 rounded-md">
+                        <div className="flex items-center justify-between text-sm text-zinc-500 dark:text-zinc-400 bg-zinc-50 dark:bg-zinc-900 p-2 rounded-md">
                             <span>Replying to thread...</span>
-                            <button className="hover:text-black font-bold" onClick={() => setReplyingToId(null)}>Cancel</button>
+                            <button className="hover:text-black dark:hover:text-white font-bold" onClick={() => setReplyingToId(null)}>Cancel</button>
                         </div>
                     )}
                     <textarea
                         value={replyText}
                         onChange={(e) => setReplyText(e.target.value)}
                         placeholder={replyingToId ? "Write a reply..." : "Post your reply"}
-                        className="w-full bg-transparent border-none focus:outline-none resize-none min-h-[50px] text-lg text-black placeholder:text-zinc-500"
+                        className="w-full bg-transparent border-none focus:outline-none resize-none min-h-[50px] text-lg text-black dark:text-white placeholder:text-zinc-500 dark:placeholder:text-zinc-400"
                     />
                     <div className="flex justify-end">
                         <button
@@ -191,7 +191,7 @@ export default function PostPage({ params }: { params: { id: string } }) {
             {/* Comment Thread (Reddit Style) */}
             <div className="flex flex-col">
                 {comments.length === 0 ? (
-                    <div className="py-8 text-center text-zinc-500 bg-white">No comments yet. Be the first to reply!</div>
+                    <div className="py-8 text-center text-zinc-500 dark:text-zinc-400 bg-white dark:bg-black">No comments yet. Be the first to reply!</div>
                 ) : (
                     comments.map(comment => (
                         <CommentThread
@@ -212,42 +212,42 @@ export default function PostPage({ params }: { params: { id: string } }) {
 
 function CommentThread({ comment, isTopLevel, onReply }: { comment: any, isTopLevel: boolean, onReply: (id: string) => void }) {
     return (
-        <div className={`flex gap-3 px-4 py-3 ${isTopLevel ? 'border-b border-zinc-100' : 'pt-3'}`}>
+        <div className={`flex gap-3 px-4 py-3 ${isTopLevel ? 'border-b border-zinc-100 dark:border-zinc-800' : 'pt-3'}`}>
             {/* Avatar & Thread Line Col */}
             <div className="flex flex-col items-center shrink-0">
-                <div className="h-8 w-8 rounded-full bg-zinc-200" />
+                <div className="h-8 w-8 rounded-full bg-zinc-200 dark:bg-zinc-800" />
                 {comment.replies && comment.replies.length > 0 && (
-                    <div className="w-[2px] flex-grow bg-zinc-200 mt-2 hover:bg-zinc-400 transition-colors cursor-pointer" />
+                    <div className="w-[2px] flex-grow bg-zinc-200 dark:bg-zinc-800 mt-2 hover:bg-zinc-400 dark:hover:bg-zinc-600 transition-colors cursor-pointer" />
                 )}
             </div>
 
             {/* Comment Body */}
             <div className="flex flex-col w-full pb-2">
                 <div className="flex items-center gap-2 text-sm">
-                    <span className="font-bold text-black hover:underline cursor-pointer">{comment.user?.displayName || "Unknown"}</span>
-                    <span className="text-zinc-500 cursor-pointer">@{comment.user?.username || "unknown"}</span>
-                    <span className="text-zinc-500">·</span>
-                    <span className="text-zinc-500 hover:underline cursor-pointer">{formatTimeAgo(comment.createdAt)}</span>
+                    <span className="font-bold text-black dark:text-white hover:underline cursor-pointer">{comment.user?.displayName || "Unknown"}</span>
+                    <span className="text-zinc-500 dark:text-zinc-400 cursor-pointer">@{comment.user?.username || "unknown"}</span>
+                    <span className="text-zinc-500 dark:text-zinc-400">·</span>
+                    <span className="text-zinc-500 dark:text-zinc-400 hover:underline cursor-pointer">{formatTimeAgo(comment.createdAt)}</span>
                 </div>
-                <p className="mt-1 text-[15px] text-black">
+                <p className="mt-1 text-[15px] text-black dark:text-zinc-100">
                     {comment.text}
                 </p>
 
                 {/* Reddit Style Actions */}
-                <div className="flex items-center gap-4 mt-2 text-zinc-500">
-                    <div className="flex items-center gap-1 bg-zinc-100 rounded-full px-2 py-1 cursor-pointer hover:bg-zinc-200 transition-colors">
+                <div className="flex items-center gap-4 mt-2 text-zinc-500 dark:text-zinc-400">
+                    <div className="flex items-center gap-1 bg-zinc-100 dark:bg-zinc-800/50 rounded-full px-2 py-1 cursor-pointer hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-colors">
                         <ArrowUp size={16} className="hover:text-orange-500" />
-                        <span className="text-xs font-bold text-black">{comment.likes}</span>
+                        <span className="text-xs font-bold text-black dark:text-white">{comment.likes}</span>
                         <ArrowDown size={16} className="hover:text-indigo-500" />
                     </div>
                     <button
                         onClick={() => onReply(comment.uid)}
-                        className="flex items-center gap-1 text-xs font-bold hover:bg-zinc-100 px-3 py-1.5 rounded-full transition-colors cursor-pointer"
+                        className="flex items-center gap-1 text-xs font-bold hover:bg-zinc-100 dark:hover:bg-zinc-800 px-3 py-1.5 rounded-full transition-colors cursor-pointer"
                     >
                         <MessageCircle size={16} />
                         Reply
                     </button>
-                    <button className="flex items-center gap-1 text-xs font-bold hover:bg-zinc-100 px-3 py-1.5 rounded-full transition-colors cursor-pointer">
+                    <button className="flex items-center gap-1 text-xs font-bold hover:bg-zinc-100 dark:hover:bg-zinc-800 px-3 py-1.5 rounded-full transition-colors cursor-pointer">
                         <Share size={16} />
                         Share
                     </button>

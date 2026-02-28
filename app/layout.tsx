@@ -25,7 +25,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-white text-black min-h-screen`}>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-white text-black dark:bg-black dark:text-white min-h-screen`}>
         <div className="mx-auto flex w-full max-w-7xl justify-center">
           {/* Left Column (Sidebar) */}
           <div className="w-[68px] sm:w-[88px] xl:w-[275px]">
@@ -33,19 +33,22 @@ export default function RootLayout({
           </div>
 
           {/* Center Column (Main Feed/Content) */}
-          <main className="w-full max-w-[600px] border-x border-zinc-200 min-h-screen">
+          <main className="flex-1 flex justify-center border-l border-r border-zinc-200 dark:border-zinc-800 min-h-screen">
             {children}
           </main>
 
           {/* Right Column (Trending/Search Placeholder) */}
           <div className="hidden lg:block w-[350px] pl-8 py-4">
-            <div className="sticky top-4 h-[500px] rounded-2xl bg-zinc-50 border border-zinc-200 p-4">
-              <h2 className="text-xl font-bold mb-4">Trending Fandoms</h2>
-              <div className="flex flex-col gap-4 text-zinc-500">
-                <span>#Naruto</span>
-                <span>#HarryPotter</span>
-                <span>#Marvel</span>
+            <div className="rounded-2xl border border-zinc-200 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 overflow-hidden">
+              <div className="p-4 border-b border-zinc-200 dark:border-zinc-800 font-bold text-xl">
+                Trending Fandoms
               </div>
+              {['#Naruto', '#MyHeroAcademia', '#JujutsuKaisen', '#OnePiece', '#DemonSlayer'].map((tag) => (
+                <div key={tag} className="px-4 py-3 hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer transition-colors">
+                  <div className="font-bold">{tag}</div>
+                  <div className="text-sm text-zinc-500 dark:text-zinc-400">12.4K posts</div>
+                </div>
+              ))}
             </div>
           </div>
         </div>

@@ -45,13 +45,13 @@ export default function Home() {
   return (
     <div className="flex flex-col w-full h-full pb-20 sm:pb-0">
       {/* Header */}
-      <div className="sticky top-0 z-10 border-b border-zinc-200 bg-white/80 backdrop-blur-md">
+      <div className="sticky top-0 z-10 border-b border-zinc-200 dark:border-zinc-800 bg-white/80 dark:bg-black/80 backdrop-blur-md">
         <div className="flex w-full">
-          <div className="flex flex-1 items-center justify-center h-14 hover:bg-zinc-100 transition-colors cursor-pointer relative">
-            <span className="font-bold text-black">For you</span>
+          <div className="flex flex-1 items-center justify-center h-14 hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-colors cursor-pointer relative">
+            <span className="font-bold text-black dark:text-white">For you</span>
             <div className="absolute bottom-0 h-1 w-16 rounded-full bg-blue-500" />
           </div>
-          <div className="flex flex-1 items-center justify-center h-14 hover:bg-zinc-100 transition-colors cursor-pointer text-zinc-500">
+          <div className="flex flex-1 items-center justify-center h-14 hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-colors cursor-pointer text-zinc-500 dark:text-zinc-400">
             <span className="font-medium">Following</span>
           </div>
         </div>
@@ -66,7 +66,7 @@ export default function Home() {
           <div className="py-8 text-center text-red-500 font-medium">{error}</div>
         )}
         {!loading && !error && comics.map((comic) => (
-          <Link href={`/post/${comic.uid}`} key={comic.uid} className="block border-b border-zinc-200 hover:bg-zinc-50 transition-colors">
+          <Link href={`/post/${comic.uid}`} key={comic.uid} className="block border-b border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-900/50 transition-colors">
             <article className="flex gap-4 px-4 py-3 cursor-pointer">
               {/* Avatar */}
               <div className="h-10 w-10 shrink-0 rounded-full bg-blue-500/20 overflow-hidden flex items-center justify-center">
@@ -80,13 +80,13 @@ export default function Home() {
               {/* Post Content */}
               <div className="flex flex-col w-full">
                 <div className="flex items-center gap-1 text-sm">
-                  <span className="font-bold text-black hover:underline">{comic.user?.displayName || "Unknown"}</span>
-                  <span className="text-zinc-500">@{comic.user?.username || "unknown"}</span>
-                  <span className="text-zinc-500">·</span>
-                  <span className="text-zinc-500 hover:underline">{formatTimeAgo(comic.createdAt)}</span>
+                  <span className="font-bold text-black dark:text-white hover:underline">{comic.user?.displayName || "Unknown"}</span>
+                  <span className="text-zinc-500 dark:text-zinc-400">@{comic.user?.username || "unknown"}</span>
+                  <span className="text-zinc-500 dark:text-zinc-400">·</span>
+                  <span className="text-zinc-500 dark:text-zinc-400 hover:underline">{formatTimeAgo(comic.createdAt)}</span>
                 </div>
 
-                <p className="mt-1 text-[15px] leading-tight text-black">
+                <p className="mt-1 text-[15px] leading-tight text-black dark:text-zinc-100">
                   {comic.userPrompt}
                 </p>
 
@@ -133,12 +133,12 @@ export default function Home() {
         ))}
         {/* End of feed message */}
         {!loading && !error && comics.length > 0 && (
-          <div className="py-8 text-center text-zinc-600 border-b border-zinc-200">
+          <div className="py-8 text-center text-zinc-600 dark:text-zinc-400 border-b border-zinc-200 dark:border-zinc-800">
             No more posts to show.
           </div>
         )}
         {!loading && !error && comics.length === 0 && (
-          <div className="py-8 text-center text-zinc-600 border-b border-zinc-200">
+          <div className="py-8 text-center text-zinc-600 dark:text-zinc-400 border-b border-zinc-200 dark:border-zinc-800">
             Your feed is empty. Start generating some comics!
           </div>
         )}
