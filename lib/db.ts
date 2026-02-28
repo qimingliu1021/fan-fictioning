@@ -71,6 +71,7 @@ function getDb(): Database.Database {
         username TEXT NOT NULL,
         parent_id TEXT,
         text TEXT NOT NULL,
+        image_base64 TEXT,
         likes INTEGER NOT NULL DEFAULT 0,
         created_at TEXT NOT NULL DEFAULT (datetime('now')),
         FOREIGN KEY (comic_uid) REFERENCES comics(uid),
@@ -81,6 +82,13 @@ function getDb(): Database.Database {
         db.exec(`
       CREATE INDEX IF NOT EXISTS idx_comments_comic_uid ON comments(comic_uid)
     `);
+
+        // Migration: add image_base64 column to comments if it doesn't exist
+        try {
+            db.exec(`ALTER TABLE comments ADD COLUMN image_base64 TEXT`);
+        } catch {
+            // Column already exists, ignore
+        }
 
         // Seed mock users if none exist
         const userCount = db.prepare("SELECT COUNT(*) as count FROM users").get() as { count: number };
@@ -283,6 +291,7 @@ export interface Comment {
     username: string;
     parent_id: string | null;
     text: string;
+    image_base64: string | null;
     likes: number;
     created_at: string;
 }
@@ -308,13 +317,14 @@ export function addComment(data: {
     username: string;
     text: string;
     parentId?: string;
+    imageBase64?: string;
 }): CommentWithUser {
     const db = getDb();
     const uid = generateUid();
 
     const stmt = db.prepare(`
-        INSERT INTO comments (uid, comic_uid, username, parent_id, text)
-        VALUES (?, ?, ?, ?, ?)
+        INSERT INTO comments (uid, comic_uid, username, parent_id, text, image_base64)
+        VALUES (?, ?, ?, ?, ?, ?)
     `);
 
     stmt.run(
@@ -322,7 +332,8 @@ export function addComment(data: {
         data.comicUid,
         data.username,
         data.parentId || null,
-        data.text
+        data.text,
+        data.imageBase64 || null
     );
 
     return db.prepare(`
