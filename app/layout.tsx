@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-
+import Sidebar from "@/components/Sidebar";
+import AnalyzeModal from "@/components/AnalyzeModal";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -23,11 +24,32 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
+    <html lang="en" className="dark">
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-black text-white min-h-screen`}>
+        <div className="mx-auto flex w-full max-w-7xl justify-center">
+          {/* Left Column (Sidebar) */}
+          <div className="w-[68px] sm:w-[88px] xl:w-[275px]">
+            <Sidebar />
+          </div>
+
+          {/* Center Column (Main Feed/Content) */}
+          <main className="w-full max-w-[600px] border-x border-zinc-800 min-h-screen">
+            {children}
+          </main>
+
+          {/* Right Column (Trending/Search Placeholder) */}
+          <div className="hidden lg:block w-[350px] pl-8 py-4">
+            <div className="sticky top-4 h-[500px] rounded-2xl bg-zinc-900 p-4">
+              <h2 className="text-xl font-bold mb-4">Trending Fandoms</h2>
+              <div className="flex flex-col gap-4 text-zinc-500">
+                <span>#Naruto</span>
+                <span>#HarryPotter</span>
+                <span>#Marvel</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <AnalyzeModal />
       </body>
     </html>
   );

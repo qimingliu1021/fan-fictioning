@@ -1,65 +1,102 @@
-import Image from "next/image";
+import { Heart, MessageCircle, Repeat2, Share } from "lucide-react";
 
 export default function Home() {
+  const MOCK_POSTS = [
+    {
+      id: 1,
+      author: "FanFic Creator",
+      handle: "@creator_ff",
+      time: "2h",
+      content: "Just generated this alternate ending for Naruto and Sasuke! What if they never fought at the Valley of the End? 🍥⚡️",
+      tags: ["#Naruto", "#FanFiction", "#WhatIf"],
+      image: true
+    },
+    {
+      id: 2,
+      author: "Anime Enjoyer",
+      handle: "@weeb_life",
+      time: "5h",
+      content: "The comic generator is literally insane. I put in a One Piece clip and the generated art for Zoro looks officially drawn. 🗡️",
+      tags: ["#OnePiece", "#Zoro"],
+      image: false
+    },
+  ];
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+    <div className="flex flex-col w-full h-full pb-20 sm:pb-0">
+      {/* Header */}
+      <div className="sticky top-0 z-10 flex h-14 items-center border-b border-zinc-800 bg-black/80 px-4 backdrop-blur-md">
+        <h1 className="text-xl font-bold">For you</h1>
+      </div>
+
+      {/* Feed Container */}
+      <div className="flex flex-col">
+        {MOCK_POSTS.map((post) => (
+          <article
+            key={post.id}
+            className="flex gap-4 border-b border-zinc-800 px-4 py-3 hover:bg-zinc-900/50 transition-colors cursor-pointer"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+            {/* Avatar */}
+            <div className="h-10 w-10 shrink-0 rounded-full bg-blue-500/20" />
+
+            {/* Post Content */}
+            <div className="flex flex-col w-full">
+              <div className="flex items-center gap-1 text-sm">
+                <span className="font-bold text-white hover:underline">{post.author}</span>
+                <span className="text-zinc-500">{post.handle}</span>
+                <span className="text-zinc-500">·</span>
+                <span className="text-zinc-500 hover:underline">{post.time}</span>
+              </div>
+
+              <p className="mt-1 text-[15px] leading-tight text-white/90">
+                {post.content}
+              </p>
+
+              <div className="mt-1 text-sm text-blue-500">
+                {post.tags.join(" ")}
+              </div>
+
+              {/* Mock Image Box */}
+              {post.image && (
+                <div className="mt-3 aspect-video w-full rounded-2xl border border-zinc-800 bg-zinc-900 flex items-center justify-center relative overflow-hidden group">
+                  <p className="text-zinc-500 font-mono text-sm">[Generated Comic Output Placeholder]</p>
+                </div>
+              )}
+
+              {/* Action Bar */}
+              <div className="mt-3 flex w-full justify-between text-zinc-500 max-w-md">
+                <button className="flex items-center gap-2 hover:text-blue-500 transition-colors group">
+                  <div className="rounded-full p-2 group-hover:bg-blue-500/10">
+                    <MessageCircle size={18} />
+                  </div>
+                  <span className="text-xs">12</span>
+                </button>
+                <button className="flex items-center gap-2 hover:text-green-500 transition-colors group">
+                  <div className="rounded-full p-2 group-hover:bg-green-500/10">
+                    <Repeat2 size={18} />
+                  </div>
+                  <span className="text-xs">4</span>
+                </button>
+                <button className="flex items-center gap-2 hover:text-pink-500 transition-colors group">
+                  <div className="rounded-full p-2 group-hover:bg-pink-500/10">
+                    <Heart size={18} />
+                  </div>
+                  <span className="text-xs">148</span>
+                </button>
+                <button className="flex items-center gap-2 hover:text-blue-500 transition-colors group">
+                  <div className="rounded-full p-2 group-hover:bg-blue-500/10">
+                    <Share size={18} />
+                  </div>
+                </button>
+              </div>
+            </div>
+          </article>
+        ))}
+        {/* End of feed message */}
+        <div className="py-8 text-center text-zinc-600 border-b border-zinc-800">
+          No more posts to show.
         </div>
-      </main>
+      </div>
     </div>
   );
 }
