@@ -1,9 +1,10 @@
 "use client";
 
-import { Heart, MessageCircle, Repeat2, Share, ArrowLeft, ArrowUp, ArrowDown } from "lucide-react";
+import { Heart, MessageCircle, Repeat2, Share, ArrowLeft, ArrowUp, ArrowDown, Pencil } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
+import EditModal from "@/components/EditModal";
 
 // Helper to format date relative to now
 function formatTimeAgo(dateString: string) {
@@ -32,6 +33,7 @@ export default function PostPage() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     // Which comment ID we are replying to (null = top level reply to the post)
     const [replyingToId, setReplyingToId] = useState<string | null>(null);
+    const [showEditModal, setShowEditModal] = useState(false);
 
     const fetchComic = async () => {
         if (!comicUid) return; // Wait until ID is available
@@ -158,6 +160,17 @@ export default function PostPage() {
                             <Share size={20} />
                         </div>
                     </button>
+                    {comic.imageBase64 && (
+                        <button
+                            onClick={() => setShowEditModal(true)}
+                            className="flex items-center gap-2 hover:text-purple-500 transition-colors group cursor-pointer"
+                        >
+                            <div className="rounded-full p-2 group-hover:bg-purple-500/10">
+                                <Pencil size={20} />
+                            </div>
+                            <span className="text-sm">Edit</span>
+                        </button>
+                    )}
                 </div>
             </article>
 
@@ -211,6 +224,38 @@ export default function PostPage() {
                     ))
                 )}
             </div>
+
+            {/* Edit Modal */}
+            {showEditModal && comic.imageBase64 && (
+                <EditModal
+                    imageBase64={comic.imageBase64}
+                    comicUid={comicUid}
+                    onClose={() => setShowEditModal(false)}
+                    onFinishAndPost={async (editedImg) => {
+                        // Post a comment with the edited image
+                        try {
+                            const res = await fetch(`/api/comic/${comicUid}/comments`, {
+                                method: "POST",
+                                headers: { "Content-Type": "application/json" },
+                                body: JSON.stringify({
+                                    text: "✏️ Edited this comic!",
+                                    imageBase64: editedImg,
+                                    username: "moviebuff42"
+                                })
+                            });
+                            if (!res.ok) throw new Error("Failed to post comment");
+                            await fetchComic();
+                        } catch (err) {
+                            console.error(err);
+                            alert("Failed to post the edited image.");
+                        }
+                        setShowEditModal(false);
+                    }}
+                    onImageUpdated={(newImg) => {
+                        setComic((prev: any) => prev ? { ...prev, imageBase64: newImg } : prev);
+                    }}
+                />
+            )}
         </div>
     );
 }
@@ -257,6 +302,17 @@ function CommentThread({
                 <p className="mt-1 text-[15px] text-black dark:text-zinc-100">
                     {comment.text}
                 </p>
+
+                {/* Image attachment (edited comic) */}
+                {comment.imageBase64 && (
+                    <div className="mt-2 rounded-xl border border-zinc-200 dark:border-zinc-700 overflow-hidden">
+                        <img
+                            src={`data:image/png;base64,${comment.imageBase64}`}
+                            alt="Edited comic"
+                            className="w-full h-auto object-contain"
+                        />
+                    </div>
+                )}
 
                 {/* Reddit Style Actions */}
                 <div className="flex items-center gap-4 mt-2 text-zinc-500 dark:text-zinc-400">
