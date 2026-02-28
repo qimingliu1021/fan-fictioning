@@ -161,35 +161,31 @@ export default function PostPage() {
                 </div>
             </article>
 
-            {/* Composition Area */}
-            <div className="flex gap-3 px-4 py-4 border-b border-zinc-200 dark:border-zinc-800">
-                <div className="h-10 w-10 shrink-0 rounded-full bg-blue-500/20 overflow-hidden flex items-center justify-center">
-                    <span className="font-bold text-blue-700 uppercase">M</span>
-                </div>
-                <div className="flex flex-col w-full gap-2">
-                    {replyingToId && (
-                        <div className="flex items-center justify-between text-sm text-zinc-500 dark:text-zinc-400 bg-zinc-50 dark:bg-zinc-900 p-2 rounded-md">
-                            <span>Replying to thread...</span>
-                            <button className="hover:text-black dark:hover:text-white font-bold" onClick={() => setReplyingToId(null)}>Cancel</button>
+            {/* Top-Level Composition Area */}
+            {replyingToId === null && (
+                <div className="flex gap-3 px-4 py-4 border-b border-zinc-200 dark:border-zinc-800">
+                    <div className="h-10 w-10 shrink-0 rounded-full bg-blue-500/20 overflow-hidden flex items-center justify-center">
+                        <span className="font-bold text-blue-700 uppercase">M</span>
+                    </div>
+                    <div className="flex flex-col w-full gap-2">
+                        <textarea
+                            value={replyText}
+                            onChange={(e) => setReplyText(e.target.value)}
+                            placeholder="Add a comment"
+                            className="w-full bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl focus:outline-none resize-none min-h-[80px] p-4 text-base text-black dark:text-white placeholder:text-zinc-500 dark:placeholder:text-zinc-400"
+                        />
+                        <div className="flex justify-end">
+                            <button
+                                disabled={!replyText.trim() || isSubmitting}
+                                onClick={handlePostComment}
+                                className="bg-black dark:bg-white text-white dark:text-black font-bold rounded-full px-5 py-2 hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                Post
+                            </button>
                         </div>
-                    )}
-                    <textarea
-                        value={replyText}
-                        onChange={(e) => setReplyText(e.target.value)}
-                        placeholder={replyingToId ? "Write a reply..." : "Post your reply"}
-                        className="w-full bg-transparent border-none focus:outline-none resize-none min-h-[50px] text-lg text-black dark:text-white placeholder:text-zinc-500 dark:placeholder:text-zinc-400"
-                    />
-                    <div className="flex justify-end">
-                        <button
-                            disabled={!replyText.trim() || isSubmitting}
-                            onClick={handlePostComment}
-                            className="bg-black text-white font-bold rounded-full px-5 py-2 hover:bg-zinc-800 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                            Reply
-                        </button>
                     </div>
                 </div>
-            </div>
+            )}
 
             {/* Comment Thread (Reddit Style) */}
             <div className="flex flex-col">
@@ -203,8 +199,14 @@ export default function PostPage() {
                             isTopLevel={true}
                             onReply={(id) => {
                                 setReplyingToId(id);
-                                window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+                                setReplyText("");
                             }}
+                            replyingToId={replyingToId}
+                            replyText={replyText}
+                            setReplyText={setReplyText}
+                            handlePostComment={handlePostComment}
+                            isSubmitting={isSubmitting}
+                            setReplyingToId={setReplyingToId}
                         />
                     ))
                 )}
@@ -213,7 +215,27 @@ export default function PostPage() {
     );
 }
 
-function CommentThread({ comment, isTopLevel, onReply }: { comment: any, isTopLevel: boolean, onReply: (id: string) => void }) {
+function CommentThread({
+    comment,
+    isTopLevel,
+    onReply,
+    replyingToId,
+    replyText,
+    setReplyText,
+    handlePostComment,
+    isSubmitting,
+    setReplyingToId
+}: {
+    comment: any,
+    isTopLevel: boolean,
+    onReply: (id: string) => void,
+    replyingToId: string | null,
+    replyText: string,
+    setReplyText: (text: string) => void,
+    handlePostComment: () => void,
+    isSubmitting: boolean,
+    setReplyingToId: (id: string | null) => void
+}) {
     return (
         <div className={`flex gap-3 px-4 py-3 ${isTopLevel ? 'border-b border-zinc-100 dark:border-zinc-800' : 'pt-3'}`}>
             {/* Avatar & Thread Line Col */}
@@ -256,11 +278,53 @@ function CommentThread({ comment, isTopLevel, onReply }: { comment: any, isTopLe
                     </button>
                 </div>
 
+                {/* Inline Reply Box */}
+                {replyingToId === comment.uid && (
+                    <div className="mt-3 flex flex-col gap-2 border-l-2 border-zinc-200 dark:border-zinc-800 pl-4">
+                        <textarea
+                            value={replyText}
+                            onChange={(e) => setReplyText(e.target.value)}
+                            placeholder={`Replying to @${comment.user?.username || 'user'}...`}
+                            className="w-full bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl focus:outline-none resize-none min-h-[80px] p-4 text-sm text-black dark:text-white placeholder:text-zinc-500 dark:placeholder:text-zinc-400"
+                            autoFocus
+                        />
+                        <div className="flex justify-end gap-2">
+                            <button
+                                className="px-4 py-1.5 rounded-full font-bold text-sm text-black dark:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+                                onClick={() => {
+                                    setReplyingToId(null);
+                                    setReplyText("");
+                                }}
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                disabled={!replyText.trim() || isSubmitting}
+                                onClick={handlePostComment}
+                                className="bg-black dark:bg-white text-white dark:text-black font-bold rounded-full px-5 py-1.5 text-sm hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                Reply
+                            </button>
+                        </div>
+                    </div>
+                )}
+
                 {/* Recursive Replies */}
                 {comment.replies && comment.replies.length > 0 && (
                     <div className="mt-1">
                         {comment.replies.map((reply: any) => (
-                            <CommentThread key={reply.uid} comment={reply} isTopLevel={false} onReply={onReply} />
+                            <CommentThread
+                                key={reply.uid}
+                                comment={reply}
+                                isTopLevel={false}
+                                onReply={onReply}
+                                replyingToId={replyingToId}
+                                replyText={replyText}
+                                setReplyText={setReplyText}
+                                handlePostComment={handlePostComment}
+                                isSubmitting={isSubmitting}
+                                setReplyingToId={setReplyingToId}
+                            />
                         ))}
                     </div>
                 )}
