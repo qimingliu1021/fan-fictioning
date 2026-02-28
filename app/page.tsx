@@ -25,8 +25,16 @@ export default function Home() {
   return (
     <div className="flex flex-col w-full h-full pb-20 sm:pb-0">
       {/* Header */}
-      <div className="sticky top-0 z-10 flex h-14 items-center border-b border-zinc-800 bg-black/80 px-4 backdrop-blur-md">
-        <h1 className="text-xl font-bold">For you</h1>
+      <div className="sticky top-0 z-10 border-b border-zinc-200 bg-white/80 backdrop-blur-md">
+        <div className="flex w-full">
+          <div className="flex flex-1 items-center justify-center h-14 hover:bg-zinc-100 transition-colors cursor-pointer relative">
+            <span className="font-bold text-black">For you</span>
+            <div className="absolute bottom-0 h-1 w-16 rounded-full bg-blue-500" />
+          </div>
+          <div className="flex flex-1 items-center justify-center h-14 hover:bg-zinc-100 transition-colors cursor-pointer text-zinc-500">
+            <span className="font-medium">Following</span>
+          </div>
+        </div>
       </div>
 
       {/* Feed Container */}
@@ -34,7 +42,7 @@ export default function Home() {
         {MOCK_POSTS.map((post) => (
           <article
             key={post.id}
-            className="flex gap-4 border-b border-zinc-800 px-4 py-3 hover:bg-zinc-900/50 transition-colors cursor-pointer"
+            className="flex gap-4 border-b border-zinc-200 px-4 py-3 hover:bg-zinc-400/50 transition-colors cursor-pointer"
           >
             {/* Avatar */}
             <div className="h-10 w-10 shrink-0 rounded-full bg-blue-500/20" />
@@ -42,13 +50,13 @@ export default function Home() {
             {/* Post Content */}
             <div className="flex flex-col w-full">
               <div className="flex items-center gap-1 text-sm">
-                <span className="font-bold text-white hover:underline">{post.author}</span>
+                <span className="font-bold text-black hover:underline">{post.author}</span>
                 <span className="text-zinc-500">{post.handle}</span>
                 <span className="text-zinc-500">·</span>
                 <span className="text-zinc-500 hover:underline">{post.time}</span>
               </div>
 
-              <p className="mt-1 text-[15px] leading-tight text-white/90">
+              <p className="mt-1 text-[15px] leading-tight text-black">
                 {post.content}
               </p>
 
@@ -58,7 +66,7 @@ export default function Home() {
 
               {/* Mock Image Box */}
               {post.image && (
-                <div className="mt-3 aspect-video w-full rounded-2xl border border-zinc-800 bg-zinc-900 flex items-center justify-center relative overflow-hidden group">
+                <div className="mt-3 aspect-video w-full rounded-2xl border border-zinc-200 bg-zinc-900 flex items-center justify-center relative overflow-hidden group">
                   <p className="text-zinc-500 font-mono text-sm">[Generated Comic Output Placeholder]</p>
                 </div>
               )}
@@ -93,7 +101,7 @@ export default function Home() {
           </article>
         ))}
         {/* End of feed message */}
-        <div className="py-8 text-center text-zinc-600 border-b border-zinc-800">
+        <div className="py-8 text-center text-zinc-600 border-b border-zinc-200">
           No more posts to show.
         </div>
       </div>
