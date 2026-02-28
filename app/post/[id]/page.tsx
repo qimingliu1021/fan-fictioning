@@ -230,18 +230,20 @@ export default function PostPage() {
                     comicUid={comicUid}
                     onClose={() => setShowEditModal(false)}
                     onFinishAndPost={async (editedImg) => {
-                        // Post a comment with the edited image
+                        // Post a comment with the edited image as a random user
                         try {
                             const res = await fetch(`/api/comic/${comicUid}/comments`, {
                                 method: "POST",
                                 headers: { "Content-Type": "application/json" },
                                 body: JSON.stringify({
-                                    text: "✏️ Edited this comic!",
+                                    text: "✏️ I made an edit to this comic!",
                                     imageBase64: editedImg,
-                                    username: "moviebuff42"
                                 })
                             });
-                            if (!res.ok) throw new Error("Failed to post comment");
+                            if (!res.ok) {
+                                const errData = await res.json().catch(() => ({}));
+                                throw new Error(errData.error || "Failed to post comment");
+                            }
                             await fetchComic();
                         } catch (err) {
                             console.error(err);
