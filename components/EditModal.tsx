@@ -31,8 +31,7 @@ export default function EditModal({ imageBase64, comicUid, onClose, onFinishAndP
     const [isLoading, setIsLoading] = useState(false);
     const [undoStack, setUndoStack] = useState<ImageData[]>([]);
     const [currentImage, setCurrentImage] = useState(imageBase64);
-    // Track whether any edit has been made
-    const hasEdited = currentImage !== imageBase64;
+
 
     useEffect(() => {
         chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -220,7 +219,7 @@ export default function EditModal({ imageBase64, comicUid, onClose, onFinishAndP
     };
 
     const handleFinishAndPost = () => {
-        if (onFinishAndPost && hasEdited) {
+        if (onFinishAndPost) {
             onFinishAndPost(currentImage);
         }
     };
@@ -238,7 +237,7 @@ export default function EditModal({ imageBase64, comicUid, onClose, onFinishAndP
                 <h2 className="font-bold text-lg text-zinc-900">Edit with AI</h2>
                 <button
                     onClick={handleFinishAndPost}
-                    disabled={!hasEdited || isLoading}
+                    disabled={isLoading}
                     className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:bg-zinc-300 text-white font-semibold px-5 py-2 rounded-full text-sm transition-colors cursor-pointer disabled:cursor-not-allowed"
                 >
                     <Check size={16} />
